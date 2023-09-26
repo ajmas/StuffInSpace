@@ -1,0 +1,148 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Sans" type="text/css">
+    <link rel="stylesheet" href="styles/icomoon.css" type="text/css">
+    <link rel="stylesheet" href="styles/perfect-scrollbar.min.css" type="text/css">
+    <link rel="stylesheet" href="styles/style.css" type="text/css">
+
+    
+
+    <title>Stuff in Space</title>
+    <script type="module" crossorigin src="/assets/index-eb2c4e42.js"></script>
+  </head>
+  <body>
+  <div id="no-webgl">
+    Stuff in Space requires <a href="https://caniuse.com/#feat=webgl">WebGL</a> and <a href="https://caniuse.com/#feat=webworkers">Web Worker</a> support.
+  </div>
+  <div id="canvas-holder">
+    <canvas id="canvas"></canvas>
+    <div id="menu-left" class="menubar">
+      <div id="search-holder" class="menu-item">
+        <span class="icon-search"></span>
+        <input type="text" id="search"></input>
+      </div>
+      <div id="menu-groups" class="menu-item">
+        <div class="menu-title">Groups</div>
+        <ul id="groups-display" class="dropdown submenu">
+          <li data-group="<clear>" class="clear-option">Clear</li>
+        </ul>
+      </div>
+     <!-- <div id="menu-color-schemes" class="menu-item">
+        <div class="menu-title">Color Schemes</div>
+        <ul id="color-schemes-submenu" class="submenu">
+          <li data-color="default">Type</li>
+          <li data-color="velocity">Velocity</li>
+          <li data-color="apogee">Apogee</li>
+        </ul>
+      </div>-->
+    </div>
+    <div id="menu-right" class="menubar">
+      <div id="menu-help" class="menu-item">
+        <div class="menu-title">Help</div>
+        <div id="help-box" class="menubox submenu">
+          <span class="box-header">Legend</span>
+          <ul id="legend">
+            <li  class="clickable satellite">
+               <img class="dot" src="/assets/dot-red-7fb11eae.png"></img>
+               Satellite
+             </li>
+            <li class="clickable rockey-body">
+              <img class="dot" src="/assets/dot-blue-4667c1bb.png"></img>
+              Rocket body
+            </li>
+            <li class="clickable debris">
+              <img class="dot" src="/assets/dot-grey-b9a43e7c.png"></img>
+              Debris
+            </li>
+          </ul>
+          <ul id="controls-info">
+            <li>
+              Left/Right click and drag to rotate camera
+            </li>
+            <li> Mousewheel to scroll </li>
+            <li>
+              Left click to select an object
+            </li>
+          </ul>
+
+        </div>
+      </div>
+      <div id="menu-about" class="menu-item">
+        <div class="menu-title">About</div>
+        <div id="about-box" class="menubox submenu">
+          <span class="box-header">Stuff in Space</span>
+          <p>Stuff in Space is a realtime 3D map of objects in Earth orbit, visualized using WebGL.</p>
+
+          <p>The website updates daily with orbit data from <a href="http://www.space-track.org">Space-Track.org</a>
+          and uses the excellent <a href="https://github.com/shashwatak/satellite-js">satellite.js</a> Javascript library
+          to calculate satellite positions.</p>
+
+          <span class="box-header">About the author</span>
+          <p>My name is James Yoder; I'm an alumnus of <a href="http://www.usfirst.org/roboticsprograms/frc"><i>FIRST</i> Robotics
+          Competition </a> (FRC) <a href="http://team624.org">Team 624</a> and an incoming Electrical and Computer Engineering freshman at the
+          University of Texas at Austin. </p>
+          <p>Contact: <a href="mailto:info@stuffin.space">info@stuffin.space</a></p>
+          <p>See Stuff in Space on <a href="https://github.com/jeyoder/ThingsInSpace"> GitHub </a></p>
+
+
+        </div>
+      </div>
+    </div>
+    <div id="search-results"></div>
+    <div id="sat-hoverbox">(none)</div>
+    <div id="sat-infobox">
+      <div id="sat-info-title">This is a title</div>
+      <div id="all-objects-link" class="link">Find all objects from this launch...</div>
+      <div class="sat-info-row">
+        <div class="sat-info-key">Int'l Designator</div>
+        <div class="sat-info-value" id="sat-intl-des">1998-067A</div>
+      </div>
+      <div class="sat-info-row">
+        <div class="sat-info-key">Type</div>
+        <div class="sat-info-value" id="sat-type">PAYLOAD</div>
+      </div>
+      <div class="sat-info-row">
+        <div class="sat-info-key">Apogee</div>
+        <div class="sat-info-value" id="sat-apogee">100 km</div>
+      </div>
+      <div class="sat-info-row">
+        <div class="sat-info-key">Perigee</div>
+        <div class="sat-info-value" id="sat-perigee">100 km</div>
+      </div>
+       <div class="sat-info-row">
+        <div class="sat-info-key">Inclination</div>
+        <div class="sat-info-value" id="sat-inclination">123.45°</div>
+      </div>
+      <div class="sat-info-row">
+        <div class="sat-info-key">Altitude</div>
+        <div class="sat-info-value" id="sat-altitude">100  km</div>
+      </div>
+      <div class="sat-info-row">
+        <div class="sat-info-key">Velocity</div>
+        <div class="sat-info-value" id="sat-velocity">100  km/s</div>
+      </div>
+      <div class="sat-info-row">
+        <div class="sat-info-key">Period</div>
+        <div class="sat-info-value" id="sat-period">100  min</div>
+      </div>
+    </div>
+    <div id="zoom-controls">
+      <div id="zoom-in" class="zoom-button">+</div>
+      <div id="zoom-out" class="zoom-button">-</div>
+    </div>
+    <div id="load-cover">
+      <div id="loader">
+        <div id="spinner"></div>
+        <div id="loader-text">
+          Downloading resources...
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </body>
+</html>
+
