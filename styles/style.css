@@ -6,7 +6,7 @@ body {
 }
 
 a,.link {
-  color: #e66;
+  color: rgb(102, 190, 238);
   text-decoration: underline;
   cursor: pointer;
 }
@@ -566,6 +566,27 @@ body.loading .toolbar {
 #mobile-hamburger span {
   color: white;
   font-size: 30px !important;
+}
+
+.attribution {
+  position: absolute;
+  bottom: 13px;
+  left: 13px;
+  font-size: 12px;
+}
+
+.attribution .updated {
+  font-style: italic;
+}
+
+canvas {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
 }
 
 @media screen and (max-width: 400px) {
