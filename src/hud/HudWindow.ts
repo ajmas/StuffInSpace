@@ -1,8 +1,10 @@
+import Events from '@/common/enums/Events';
+
 class Window {
   element?: HTMLElement;
   id: string;
   options?: Record<string, any>;
-  listeners: Record<string, Set<(data: any) => void>>  ={};
+  listeners: Record<string, Set<(data: any) => void>> = {};
   firstOpen = true;
   windowManager: any;
 
@@ -29,7 +31,7 @@ class Window {
     this.element.classList.add('visible');
     this.element.classList.remove('hidden');
     this.windowManager.bringWindowToFront(this);
-    this.fireEvent('open', {});
+    this.fireEvent(Events.open);
   }
 
   close () {
@@ -40,7 +42,7 @@ class Window {
     this.element.classList.remove('active');
     this.element.classList.remove('visible');
     this.element.classList.add('hidden');
-    this.fireEvent('close', {});
+    this.fireEvent(Events.close);
   }
 
   isOpen () {
@@ -106,7 +108,7 @@ class Window {
     }
   }
 
-  fireEvent (eventName: string, data: any) {
+  fireEvent (eventName: Events, data?: any) {
     if (this.listeners[eventName]) {
       const listenerSet = this.listeners[eventName];
       listenerSet.forEach((listener) => {

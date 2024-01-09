@@ -16,6 +16,8 @@ import SatelliteGroup from './SatelliteGroup';
 import ShaderStore from './ShaderStore';
 import logger from '@/utils/logger';
 import { ArrowHelper, Raycaster, Vector2, Vector3 } from 'three';
+import { SatelliteObject } from '../common/interfaces/SatelliteObject';
+import Events from '@/common/enums/Events';
 
 class Viewer {
   config: Record<string, any> = {
@@ -82,8 +84,8 @@ class Viewer {
     }
   }
 
-  private onSatDataLoaded (satData: Record<string, any>) {
-    this.eventManager.fireEvent('satdataloaded', satData);
+  private onSatDataLoaded (satData: SatelliteObject[]) {
+    this.eventManager.fireEvent(Events.satDataLoaded, satData);
     this.ready = true;
   }
 
@@ -153,7 +155,8 @@ class Viewer {
   }
 
   private isValidTarget (satelliteIdx: number): boolean {
-    const satelliteGroup = this.satellites?.getSatellitegroup() as SatelliteGroup;
+    const satelliteGroup =
+      this.satellites?.getSatellitegroup() as SatelliteGroup;
 
     if (satelliteGroup) {
       return satelliteGroup.hasSat(satelliteIdx);
@@ -175,7 +178,7 @@ class Viewer {
     });
 
     let satIdx = -1;
-    let satellite;
+    let satellite: SatelliteObject | undefined;
     if (satelliteIds && satelliteIds.length > 0) {
       // This is the first possible satellite, it is the closest to the camera
       satIdx = satelliteIds[0];
@@ -185,7 +188,7 @@ class Viewer {
     this.selectedSatelliteIdx = satIdx;
     this.satellites?.setSelectedSatellite(satIdx);
     this.orbits?.setSelectedSatellite(satIdx);
-    this.eventManager.fireEvent('selectedSatChange', satellite);
+    this.eventManager.fireEvent(Events.selectedSatChange, satellite);
   }
 
   onMouseMove () {
@@ -229,7 +232,12 @@ class Viewer {
 
     this.satellites?.setHoverSatellite(satIdx);
     this.orbits?.setHoverSatellite(satIdx);
-    this.eventManager.fireEvent('sathoverChange', satellite);
+    this.eventManager.fireEvent(Events.satHover, {
+      satellite,
+      satId: satIdx,
+      satX: event.clientX,
+      satY: event.clientY,
+    });
     this.mouseMoved = true;
   }
 
@@ -281,7 +289,7 @@ class Viewer {
       this.context.satelliteStore = this.satelliteStore;
       this.context.shaderStore = this.shaderStore;
 
-      this.satelliteStore.addEventListener('satdataloaded', this.onSatDataLoaded.bind(this));
+      this.satelliteStore.addEventListener(Events.satDataLoaded, this.onSatDataLoaded.bind(this));
 
       this.earth = new Earth();
       await this.registerSceneComponent('earth', this.earth);

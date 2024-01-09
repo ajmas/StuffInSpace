@@ -1,3 +1,6 @@
+import EventData from '@/common/interfaces/EventData';
+import Events from '@/common/enums/Events';
+
 class EventManager {
   listeners: Record<string, Set<any>> = {};
   supportedEvents: string[] | undefined;
@@ -28,12 +31,10 @@ class EventManager {
     }
   }
 
-  fireEvent (eventName: string, data: any) {
+  fireEvent<E extends Events> (eventName: E, data: EventData[E]) {
     if (!eventName) {
       throw new Error('undefined eventName');
     }
-
-    eventName = eventName.toLowerCase();
 
     if (this.listeners[eventName]) {
       const listenerSet = this.listeners[eventName];

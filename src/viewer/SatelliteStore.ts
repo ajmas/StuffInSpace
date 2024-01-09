@@ -1,7 +1,8 @@
 import axios from 'axios';
 import EventManager from '../utils/event-manager';
 import logger from '../utils/logger';
-import { SatelliteObject } from './interfaces/SatelliteObject';
+import { SatelliteObject } from '../common/interfaces/SatelliteObject';
+import Events from '@/common/enums/Events';
 
 const config = {
   baseUrl: import.meta.env.BASE_URL
@@ -58,7 +59,7 @@ class SatelliteStore {
         }
       }
 
-      this.eventManager.fireEvent('satdataloaded', this.satData);
+      this.eventManager.fireEvent(Events.satDataLoaded, this.satData);
       this.loaded = true;
     } catch (error) {
       logger.error('error loading TLE data', error);
@@ -78,7 +79,7 @@ class SatelliteStore {
     this.gotExtraData = includesExtraData;
 
     if (includesExtraData) {
-      this.eventManager.fireEvent('satextradataloaded', this.satData);
+      this.eventManager.fireEvent(Events.satDataLoaded, this.satData);
     }
   }
 
