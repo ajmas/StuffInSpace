@@ -1,5 +1,5 @@
-import { DateTime } from 'luxon';
 import { Object3D, SphereGeometry, PointLight, Mesh, Group } from '../utils/three';
+import { EpochUTC, Sun as SunObject} from 'ootk-core';
 import SceneComponent from './interfaces/SceneComponent';
 import SatelliteOrbitScene from './SatelliteOrbitScene';
 
@@ -20,26 +20,10 @@ class Sun implements SceneComponent {
   }
 
   calculateSunLoc () {
-    // This is a simple sun location calculator. Here until I get
-    // original code back in
-    const distance = 25;
+    const eci = SunObject.position(EpochUTC.fromDateTime(new Date()));
+    const scaled = eci.normalize().scale(25);
 
-    let hour = this.hour;
-    // if we aren't overriding the hour, then calculate from actual time
-    if (hour === undefined || hour === -1) {
-      const time = DateTime.utc();
-      hour = time.hour;
-    }
-
-    // adjust by 180, since left of texture is at 0
-    const angle = ((hour / 24) * 360) + 180;
-
-    const point = {
-      x: distance * Math.cos( this.degreesToReadians(angle) ),
-      z: distance * Math.sin( this.degreesToReadians(angle) ),
-    };
-
-    return point;
+    return scaled;
   }
 
   init (scene: SatelliteOrbitScene) {
@@ -52,9 +36,8 @@ class Sun implements SceneComponent {
       this.hour = -1;
     }
 
-    this.calculateSunLoc();
     const sunLoc = this.calculateSunLoc();
-    const coords = { x: sunLoc.x, y: 0, z: sunLoc.z};
+    const coords = { x: sunLoc.x, y: 0, z: -sunLoc.y};
 
     this.scene = scene;
     this.objectGroup = new Group();

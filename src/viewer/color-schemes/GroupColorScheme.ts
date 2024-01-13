@@ -1,10 +1,10 @@
 import SatelliteGroup from '@satellite-viewer/SatelliteGroup';
 import ColorScheme from './ColorScheme';
-import { SatelliteObject } from '../interfaces/SatelliteObject';
+import { Satellite } from 'ootk-core';
 
 class GroupColorScheme extends ColorScheme {
   constructor () {
-    super ('Group color scheme', (satellite: SatelliteObject, group?: SatelliteGroup) => {
+    super ('Group color scheme', (satellite: Satellite, group?: SatelliteGroup) => {
       if (satellite) {
         if (group?.hasSat(satellite.id)) {
           return {

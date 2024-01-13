@@ -3,7 +3,7 @@ const baseUrl = import.meta.env.BASE_URL;
 const config = {
   appName: 'Stuff in Space',
   baseUrl,
-  propergateInterval: 1000, // milliseconds
+  propagateInterval: 1000, // milliseconds
   pushHistory: false,
   logLevel: 'debug',
   satWorker: {

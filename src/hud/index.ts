@@ -1,9 +1,10 @@
 /* eslint-disable no-loop-func */
-import { R2D, Events } from '@/constants';
+import { Events } from '@/constants';
 import SatelliteGroup from '@satellite-viewer/SatelliteGroup';
 import { Viewer } from '@satellite-viewer/index';
 import HudWindowManager from './HudWindowManager';
 import searchBox from './SearchBox';
+import { Satellite } from 'ootk-core';
 
 const supporteEvents: string[] = [];
 const windowManager = new HudWindowManager();
@@ -70,16 +71,23 @@ function setHtml (selector: string, html: string) {
   }
 }
 
-function onSelectedSatChange (satellite: Record<string, any>) {
+function onSelectedSatChange (satellite: Satellite) {
   if (satellite) {
     document.querySelector('#sat-infobox')?.classList.add('visible');
-    setHtml('#sat-info-title', satellite.OBJECT_NAME);
+    setHtml('#sat-info-title', satellite.name);
     setHtml('#sat-intl-des', satellite.intlDes);
-    setHtml('#sat-type', satellite.OBJECT_TYPE);
+    setHtml('#sat-type', satellite.getTypeString());
     setHtml('#sat-apogee', `${satellite.apogee?.toFixed(0)} km`);
     setHtml('#sat-perigee', `${satellite.perigee?.toFixed(0)} km`);
-    setHtml('#sat-inclination', `${(satellite.inclination * R2D).toFixed(2)}°`);
+    setHtml('#sat-inclination', `${(satellite.inclination).toFixed(2)}°`);
     setHtml('#sat-period', `${satellite.period?.toFixed(2)} min`);
+    const lla = satellite.lla();
+    const latitude = lla.lat > 0 ? `${lla.lat.toFixed(2)}°N` : `${Math.abs(lla.lat).toFixed(2)}°S`;
+    setHtml('#sat-latitude', latitude);
+    const longitude = lla.lon > 0 ? `${lla.lon.toFixed(2)}°E` : `${Math.abs(lla.lon).toFixed(2)}°W`;
+    setHtml('#sat-longitude', longitude);
+    setHtml('#sat-altitude', `${lla.alt.toFixed(2)} km`);
+    setHtml('#sat-velocity', `${satellite.totalVelocity.toFixed(2)} km/s`);
   } else {
     document.querySelector('#sat-infobox')?.classList.remove('visible');
   }
@@ -254,6 +262,10 @@ function initEventListeners () {
 
 function onSatMovementChange (event: any) {
   if (event.satId) {
+    const latitude = event.latitude > 0 ? `${event.latitude.toFixed(2)}°N` : `${Math.abs(event.latitude).toFixed(2)}°S`;
+    setHtml('#sat-latitude', latitude);
+    const longitude = event.longitude > 0 ? `${event.longitude.toFixed(2)}°E` : `${Math.abs(event.longitude).toFixed(2)}°W`;
+    setHtml('#sat-longitude', longitude);
     setHtml('#sat-altitude', `${event.altitude.toFixed(2)} km`);
     setHtml('#sat-velocity', `${event.velocity.toFixed(2)} km/s`);
   }

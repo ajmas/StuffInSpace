@@ -96,14 +96,14 @@ function fillResultBox (results: SearchResults[], searchStr: string) {
 
     html += `<div class="search-result" data-sat-id="${satellite.id}">`;
     if (result.type !== 'name') {
-      html += satellite.OBJECT_NAME;
+      html += satellite.name;
     } else {
       html += `
-      ${satellite.OBJECT_NAME.substring(0, result.strIndex)}
+      ${satellite.name.substring(0, result.strIndex)}
       <span class="search-hilight">
-        ${satellite.OBJECT_NAME.substring(result.strIndex, result.strIndex + searchStr.length)}
+        ${satellite.name.substring(result.strIndex, result.strIndex + searchStr.length)}
       </span>
-      ${satellite.OBJECT_NAME.substring(result.strIndex + searchStr.length)}`;
+      ${satellite.name.substring(result.strIndex + searchStr.length)}`;
     }
 
     html += '<div class="search-result-intldes">';
@@ -116,11 +116,11 @@ function fillResultBox (results: SearchResults[], searchStr: string) {
       ${satellite.intlDes.substring(result.strIndex + searchStr.length)}`;
     } else if (result.type === 'noradId') {
       html += `
-      ${satellite.NORAD_CAT_ID.substring(0, result.strIndex)}
+      ${satellite.sccNum.substring(0, result.strIndex)}
       <span class="search-hilight">
-        ${satellite.NORAD_CAT_ID.substring(result.strIndex, result.strIndex + searchStr.length)}
+        ${satellite.sccNum.substring(result.strIndex, result.strIndex + searchStr.length)}
       </span>
-      ${satellite.NORAD_CAT_ID.substring(result.strIndex + searchStr.length)}`;
+      ${satellite.sccNum.substring(result.strIndex + searchStr.length)}`;
     } else {
       html += satellite.intlDes;
     }
@@ -158,18 +158,18 @@ function doSearch (str: string) {
 
   const results: SearchResults[] = [];
   for (let i = 0; i < satData.length; i++) {
-    if (satData[i]?.NORAD_CAT_ID?.indexOf(str) !== -1) {
+    if (satData[i]?.sccNum?.indexOf(str) !== -1) {
       results.push({
         type: 'noradId',
-        strIndex: satData[i].NORAD_CAT_ID.indexOf(str),
+        strIndex: satData[i].sccNum.indexOf(str),
         satId: i
       });
     }
 
-    if (satData[i]?.OBJECT_NAME.indexOf(str) !== -1) {
+    if (satData[i]?.name.indexOf(str) !== -1) {
       results.push({
         type: 'name',
-        strIndex: satData[i].OBJECT_NAME.indexOf(str),
+        strIndex: satData[i].name.indexOf(str),
         satId: i
       });
     }

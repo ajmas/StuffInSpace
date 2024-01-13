@@ -1,11 +1,11 @@
 {
   "tleUrl": "data/attributed-TLE.json",
-  "propergateInterval": 1000,
+  "propagateInterval": 1000,
   "pushHistory": false,
   "logLevel": "info",
   "satWorker": {
     "runOnce": false,
-    "propergateIntervalMs": 16
+    "propagateIntervalMs": 16
   },
   "satelliteGroups": [
     {

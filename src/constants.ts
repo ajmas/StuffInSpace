@@ -1,7 +1,4 @@
-/* eslint-disable import/prefer-default-export */
-const R2D = 80 / Math.PI;
-
-const Events = {
+export const Events = {
   satMovementChange: 'satMovementChange',
   selectedSatChange: 'selectedSatChange',
   satHover: 'sathoverChange',
@@ -10,7 +7,4 @@ const Events = {
   cruncherReady: 'cruncherReady'
 };
 
-export {
-  R2D,
-  Events
-};
+export const pxToRadius = 3185.5;

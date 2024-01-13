@@ -3,12 +3,12 @@ import { Color, TextureLoader, MeshPhongMaterial, SphereGeometry, Mesh, Group, B
 import SceneComponent from './interfaces/SceneComponent';
 import SatelliteOrbitScene from './SatelliteOrbitScene';
 import { ViewerContext } from './interfaces/ViewerContext';
+import { calcGmst } from 'ootk-core';
 
 class Earth implements SceneComponent {
   baseUrl = '';
   basePath = '/StuffInSpace/images';
   radiusInKm = 6371.0;
-  pxToRadius = 3185.5;
   addAtmosphere = false;
   addClouds = true;
 
@@ -140,7 +140,8 @@ class Earth implements SceneComponent {
   }
 
   update (): void {
-    // do nothing
+    const {gmst} = calcGmst(new Date());
+    this.getMesh()?.rotation.set(0, gmst, 0);
   }
 
   getMesh () {

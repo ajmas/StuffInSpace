@@ -21,8 +21,8 @@ import DefaultColorScheme from './color-schemes/DefaultColorScheme';
 import SelectableSatellite from './interfaces/SelectableSatellite';
 import ShaderStore from './ShaderStore';
 import GroupColorScheme from './color-schemes/GroupColorScheme';
-import { SatelliteObject } from './interfaces/SatelliteObject';
 import { ViewerContext } from './interfaces/ViewerContext';
+import { Satellite } from 'ootk-core';
 
 class Satellites implements SceneComponent, SelectableSatellite {
   baseUrl = '';
@@ -75,28 +75,13 @@ class Satellites implements SceneComponent, SelectableSatellite {
   }
 
   updateSatellites () {
-    if (!this.satelliteStore) {
-      return;
-    }
-
-    if (this.satPos && this.satPos.length > 0) {
-      if (this.geometry?.attributes) {
-
-        const satellites = this.satelliteStore.satData;
-        const satCount = satellites.length;
-
-        this.updateSatellitesGeometry();
-        this.updateSatellitesMaterial(satCount, satellites);
-      }
-    }
-
-    this.debugRaycastSelection();
+    console.warn('updateSatellites');
   }
 
   /**
    * update point colours
    */
-  private updateSatellitesMaterial (satCount: number, satellites: SatelliteObject[]) {
+  private updateSatellitesMaterial (satCount: number, satellites: Satellite[]) {
     if (this.geometry?.attributes.color && this.currentColorScheme && this.satelliteStore) {
       // Adjust if the satellite count adjusts
       if (this.satelliteColors.length === 0 || (satCount * 4 !== this.satelliteColors.length)) {
@@ -124,17 +109,6 @@ class Satellites implements SceneComponent, SelectableSatellite {
    */
   private updateSatellitesGeometry () {
     if (this.geometry?.attributes.position && this.satelliteStore) {
-      const vertices: Float32Array = new Float32Array();
-      vertices.fill(0, 0, this.satelliteStore.satData.length * 3);
-      this.geometry.setAttribute('position', new Float32BufferAttribute(vertices, 3));
-
-      // deal with NaN
-      for (let i = 0; i < this.satPos.length; i++) {
-        if (isNaN(this.satPos[i])) {
-          this.satPos[i] = 0;
-        }
-      }
-
       this.geometry.setAttribute('position', new Float32BufferAttribute(this.satPos, 3));
 
       this.geometry.computeBoundingBox();
@@ -152,53 +126,18 @@ class Satellites implements SceneComponent, SelectableSatellite {
       return;
     }
 
-    const satCount = satData.length;
-    let satExtraData: Record<string, any>[];
-
     try {
-      if (!this.satelliteStore.gotExtraData) { // store extra data that comes from crunching
-        const start = performance.now();
-
-        if (message.data.extraData) {
-          satExtraData = JSON.parse(message.data.extraData);
-
-          if (!satExtraData) {
-            return;
-          }
-
-          for (let i = 0; i < satCount; i++) {
-            satData[i].inclination = satExtraData[i].inclination;
-            satData[i].eccentricity = satExtraData[i].eccentricity;
-            satData[i].raan = satExtraData[i].raan;
-            satData[i].argPe = satExtraData[i].argPe;
-            satData[i].meanMotion = satExtraData[i].meanMotion;
-
-            satData[i].semiMajorAxis = satExtraData[i].semiMajorAxis;
-            satData[i].semiMinorAxis = satExtraData[i].semiMinorAxis;
-            satData[i].apogee = satExtraData[i].apogee;
-            satData[i].perigee = satExtraData[i].perigee;
-            satData[i].period = satExtraData[i].period;
-          }
-
-          logger.debug(`sat.js copied extra data in ${performance.now() - start} ms`);
-          this.satelliteStore.setSatelliteData(satData, true);
-          return;
-        }
-      }
-
       this.satPos = new Float32Array(message.data.satPos);
       this.satVel = new Float32Array(message.data.satVel);
-      this.satAlt = new Float32Array(message.data.satAlt);
 
       this.satelliteStore.setPositionalData(
-        this.satVel, this.satPos, this.satAlt
+        this.satVel, this.satPos
       );
 
       if (!this.cruncherReady) {
         document.querySelector('#load-cover')?.classList.add('hidden');
         this.cruncherReady = true;
       }
-      this.updateSatellites();
     } catch (error) {
       logger.debug('Error in worker response', error);
       logger.debug('worker message', message);
@@ -236,7 +175,6 @@ class Satellites implements SceneComponent, SelectableSatellite {
   setSelectedSatellites (satelliteIndexes: number[]) {
     logger.debug('Updated selected satellites', satelliteIndexes);
     this.selectedSatelliteIndexes = satelliteIndexes;
-    this.updateSatellites();
   }
 
   setSelectedSatellite (satelliteIdx: number) {
@@ -245,7 +183,6 @@ class Satellites implements SceneComponent, SelectableSatellite {
 
   setHoverSatellite (satelliteIdx: number) {
     this.hoverSatelliteIdx = satelliteIdx;
-    this.updateSatellites();
   }
 
   private initGeometry () {
@@ -365,8 +302,33 @@ class Satellites implements SceneComponent, SelectableSatellite {
     }
   }
 
-  update (): void {
-    // do nothing for now
+  update (scene: SatelliteOrbitScene): void {
+    if (!this.satelliteStore) {
+      return;
+    }
+
+    if (this.satPos?.length > 0) {
+
+      for (let i = 0; i < this.satPos.length; i++) {
+        this.satPos[i] = this.satPos[i] + this.satVel[i] * scene.dt;
+
+        // deal with NaN
+        if (isNaN(this.satPos[i])) {
+          this.satPos[i] = 0;
+        }
+      }
+
+      if (this.geometry?.attributes) {
+
+        const satellites = this.satelliteStore.satData;
+        const satCount = satellites.length;
+
+        this.updateSatellitesGeometry();
+        this.updateSatellitesMaterial(satCount, satellites);
+      }
+    }
+
+    this.debugRaycastSelection();
   }
 }
 

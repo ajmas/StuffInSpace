@@ -16,8 +16,9 @@ import SatelliteGroup from './SatelliteGroup';
 import ShaderStore from './ShaderStore';
 import logger from '@/utils/logger';
 import { ArrowHelper, Raycaster, Vector2, Vector3 } from 'three';
-import { SatelliteObject } from './interfaces/SatelliteObject';
 import { ViewerContext } from './interfaces/ViewerContext';
+import { pxToRadius } from '@/constants';
+import { Satellite } from 'ootk-core';
 
 class Viewer {
   config: Record<string, any> = {
@@ -54,6 +55,7 @@ class Viewer {
   maxZoomLevel = 10;
   private frameCount = 0;
   private raycastFrameInterval = 16;
+  highResTimeStamp = 0;
 
   constructor (config?: Record<string, any>) {
     this.config = { ...this.config, ...config };
@@ -91,7 +93,7 @@ class Viewer {
     }
   }
 
-  private onSatDataLoaded (satData: SatelliteObject[]) {
+  private onSatDataLoaded (satData: Satellite[]) {
     this.eventManager.fireEvent('satdataloaded', satData);
     this.ready = true;
   }
@@ -323,8 +325,17 @@ class Viewer {
     }
   }
 
+  /**
+   * This is the main animation loop. It is called once per frame and
+   * never more than 60 times per second.
+   */
   animate () {
     requestAnimationFrame(this.animate.bind(this));
+    if (!this.scene) {return;}
+    const highResTimeStamp = performance.now();
+    const dt = highResTimeStamp - this.highResTimeStamp;
+    this.highResTimeStamp = highResTimeStamp;
+    this.scene.dt = dt / pxToRadius;
 
     for (const component of this.sceneComponents) {
       component.update(this.scene);
@@ -335,7 +346,9 @@ class Viewer {
     }
 
     if (this.renderer) {
-      this.renderer.render(this.scene as SatelliteOrbitScene, this.camera as Camera);
+      // This converts everything from 3D space to ECI (z and y planes are swapped)
+      this.scene.up.set(0, 0, 1);
+      this.renderer.render(this.scene, this.camera as Camera);
     }
 
     this.frameCount++;
@@ -423,7 +436,7 @@ class Viewer {
     this.satellites?.setSatelliteGroup(satelliteGroup);
   }
 
-  getSelectedSatellite (): SatelliteObject | undefined {
+  getSelectedSatellite (): Satellite | undefined {
     if (this.satelliteStore) {
       return this.satelliteStore.getSatellite(this.selectedSatelliteIdx);
     }

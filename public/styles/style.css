@@ -124,7 +124,7 @@ ul {
   bottom: 0;
   margin-top: auto;
   margin-bottom: auto;
-  height: 250px;
+  height: fit-content;
   width: 200px;
   display: none;
 }
