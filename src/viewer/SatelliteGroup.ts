@@ -83,10 +83,12 @@ class SatelliteGroup {
    * @throws {Error} If nameRegex is not a string.
    */
   private searchNameRegex () {
-    if (typeof this.data !== 'string') {
-      throw new Error('nameRegex must be a string');
+    if (typeof this.data === 'string') {
+      throw new Error('nameRegex must be a RegExp');
     }
-    const regex = new RegExp(this.data);
+
+    // These are set as regular expressions in the config file.
+    const regex = this.data as RegExp;
     const satIdList = this.satelliteStore.searchNameRegex(regex);
     for (const satId of satIdList) {
       this.sats.push({
